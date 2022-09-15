@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>DoNotes</title>
+    <script type="text/javascript" src="./tinymce/tinymce.min.js"></script>
+    <script type="text/javascript" src="./jquery.js"></script>
+    <script type="text/javascript" src="./fs/dist/FileSaver.min.js"></script>
+    <script type="text/javascript" src="./fabric.min.js"></script>
+    <script type="text/javascript" src="./svgjs/index.js"></script>
+    <script type="text/javascript" src="./svgjs/cli.js"></script>
+    <script type="text/javascript" src="pdf.js"></script>
+    <script type="text/javascript">
+    function escapeRegExp(str) {
+        return str.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
+    }
+
+    function replaceAll(str, find, replace) {
+        return str.replace(new RegExp(escapeRegExp(find), 'g'), replace);
+    }
+    tinymce.init({
+
+        selector: 'textarea#default',
+        setup: (editor) => {
+    editor.addShortcut('meta+s', 'Save file.', () => {
+      parent.saveTxt("SaveNow");
+    });
+  },
+        menubar: false,
+        height: 1999,
+        min_height: 1999,
+        skin_url: "./custom2/skins/ui/CUSTOM",
+        plugins: " paste image media link tinydrive code imagetools autoresize autolink lists  media  table  wordcount pagebreak nonbreaking",
+        toolbar: "contextmenu | code pagebreak paste pastetext | undo redo | bold italic underline strikethrough | superscript subscript | fontselect fontsizeselect formatselect | alignleft aligncenter alignright alignjustify | outdent indent |  numlist bullist checklist | forecolor backcolor casechange permanentpen formatpainter removeformat | pagebreak | charmap emoticons | fullscreen  preview save print | insertfile image media pageembed template link anchor codesample |  ltr rtl | showcomments addcomment |restoredraft    | table wordcount ",
+        toolbar_mode: "scrolling",
+        contextmenu: "bold italic underline strikethrough superscript subscript | link image inserttable | cell row column deletetable | paste pastetext ",
+        font_formats: "Andale Mono=andale mono,times; Arial=arial,helvetica,sans-serif; Arial Black=arial black,avant garde; Book Antiqua=book antiqua,palatino; Comic Sans MS=comic sans ms,sans-serif; Courier New=courier new,courier; Georgia=georgia,palatino; Helvetica=helvetica; Impact=impact,chicago;Quicksand=Quicksand, sans-serif; Symbol=symbol; Tahoma=tahoma,arial,helvetica,sans-serif; Terminal=terminal,monaco; Times New Roman=times new roman,times; Trebuchet MS=trebuchet ms,geneva; Verdana=verdana,geneva; Webdings=webdings; Wingdings=wingdings,zapf dingbats",
+        toolbar_sticky: !0,
+        pagebreak_split_block: !0,
+        toolbar_sticky_offset: 32,
+        tinycomments_mode: "embedded",
+        entity_encoding: "raw",
+    });
+    function saveTxt() {
+        save();
+    }
+    </script>
+    <style>
+    @import url('https://fonts.googleapis.com/css2?family=Josefin+Sans&family=Poppins:wght@300&family=Quicksand:wght@300&family=Raleway:wght@400;800&family=Roboto:wght@300&display=swap');
+    body {
+        margin: 0;
+        background: white;
+        text-align: center;
+        font-family: Raleway, sans-serif;
+    }
+    
+    label {
+        appearance: auto;
+        writing-mode: horizontal-tb !important;
+        font-style: ;
+        font-variant-ligatures: ;
+        font-variant-caps: ;
+        font-variant-numeric: ;
+        font-variant-east-asian: ;
+        font-weight: ;
+        font-stretch: ;
+        font-size: 14px;
+        font-family: sans-serif;
+        text-rendering: auto;
+        color: buttontext;
+        letter-spacing: normal;
+        word-spacing: normal;
+        line-height: normal;
+        text-transform: none;
+        text-indent: 0px;
+        text-shadow: none;
+        display: inline-block;
+        text-align: center;
+        align-items: flex-start;
+        cursor: default;
+        box-sizing: border-box;
+        background-color: -internal-light-dark(rgb(239, 239, 239), rgb(59, 59, 59));
+        margin: 0em;
+        padding: 1px 6px;
+        border-width: 2px;
+        border-style: outset;
+        border-color: buttonborder;
+        border-image: initial;
+    }
+    
+    nav {
+        position: fixed;
+        top: 0;
+        z-index: 9999;
+        user-select: none;
+        /* supported by Chrome and Opera */
+        -webkit-user-select: none;
+        /* Safari */
+        -khtml-user-select: none;
+        /* Konqueror HTML */
+        -moz-user-select: none;
+        /* Firefox */
+        -ms-user-select: none;
+        /* Internet Explorer/Edge */
+    }
+    
+    nav {
+        width: 100%;
+        text-align: center;
+        background: #eee;
+        display: flex;
+    }
+    
+    .img {
+        margin-left: auto;
+        order: 2;
+    }
+    
+    .container {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: white;
+        border-radius: 5px;
+        width: 70%;
+        text-align: center;
+        display: flex;
+        justify-content: center;
+    }
+    .blocked {
+        background:  grey !important    ;
+        cursor:     not-allowed !important   ;
+    }
+    .panel {
+        margin: 150px 150px;
+        width: 300px;
+        height: 300px;
+        display: inline-block;
+        box-shadow: 0 15px 55px #0004;
+        font-weight: 600;
+        font-size: 25px;
+        position: relative;
+        transition: all 0.1s linear;
+    }
+    
+    .panel:hover {
+        background: #ddd;
+        cursor: pointer;
+    }
+    
+    .panel:active {
+        transform: translateY( 10%);
+        box-shadow: 0 9px 25px #0006;
+    }
+    
+    .back canvas {
+        pointer-events: none;
+    }
+    
+    .back {
+        pointer-events: none;
+    }
+    
+    .panel .content {
+        top: 50%;
+        position: relative;
+        transform: translateY( -50%);
+    }
+    
+    .middle {
+        transform: translateY( 50%);
+        position: relative;
+    }
+    
+    nav button,
+    .abtn,
+    .btn1 {
+        outline: none;
+        max-height: 50%;
+        background: #eee;
+        border: none;
+        cursor: pointer;
+        border-right: 2px solid #5273feaa;
+    }
+    
+    ::-webkit-scrollbar {
+        width: 20px;
+    }
+    
+    ::-webkit-scrollbar-track {
+        background-color: transparent;
+    }
+    
+    ::-webkit-scrollbar-thumb {
+        background-color: #d6dee1;
+        border-radius: 20px;
+        border: 6px solid transparent;
+        background-clip: content-box;
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+        background-color: #a8bbbf;
+    }
+    
+    .dropdown {
+        display: inline-block;
+    }
+    
+    .dropdown-content {
+        display: none;
+        position: absolute;
+        background-color: #f1f1f1;
+        min-width: 160px;
+        box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+        z-index: 991;
+    }
+    
+    .dropdown-content .dbtn {
+        width: 100%;
+        color: black;
+        padding: 12px 16px;
+        text-decoration: none;
+        display: block;
+    }
+    
+    .middle {
+        position: absolute;
+        left: 50%;
+        transform: translateX( -50%);
+    }
+    
+    .dropdown-content .dbtn:hover {
+        background-color: #ddd;
+    }
+    
+    .dropdown:hover .dropdown-content {
+        display: block;
+    }
+    
+    .dropdown:hover .dropbtn {
+        background-color: #3e8e41;
+    }
+    
+    .penset {
+        position: fixed;
+        bottom: 25px;
+        right: 25px;
+        z-index: 999;
+        display: flex;
+        align-items: baseline;
+    }
+    
+    .penset * {
+        display: inline-block;
+    }
+    
+    .hide {
+        display: none;
+    }
+    
+    .abtn {
+        background: white;
+        box-shadow: 0 15px 55px #0004;
+        border-right: none;
+        padding: 25px;
+        border-radius: 50%;
+    }
+    
+    canvas {
+        z-index: 99;
+    }
+    
+    .front {
+        z-index: 99 !important;
+        pointer-events: none;
+    }
+    
+    .pointer {
+        pointer-events: none;
+    }
+    
+    svg {
+        display: none;
+    }
+    .tox-editor-header {
+        z-index:  999 !important;
+    }
+    </style>
+</head>
+
+<body>
+    <div id="svg"></div>
+    <input type="file" name="inputfile" id="inputfile" style="display: none;" accept="dn">
+    <input type="file" accept="image/*" style=" display:    none    ;" id="img-import">
+    <input type="file" accept="application/pdf" id="pdfinput" style=" display:    none    ;">
+    <nav>
+        <div class="dropdown">
+            <button id="file">File</button>
+            <div class="dropdown-content">
+                <button id="new" class="dbtn" onclick="confirmAction()">New</button>
+                <label for="inputfile" id="open" class="dbtn btn1">Open</label>
+                <button onclick="save()" id="save" class="dbtn">Save as</button>
+                <button id="save-as" class="dbtn blocked">Save as</button>
+                <button onclick="window.close();" class="dbtn ">Close</button>
+            </div>
+        </div>
+        <div class="dropdown">
+            <button id="edit">Edit</button>
+            <div class="dropdown-content">
+                <button id="rename" class="dbtn">Rename</button>
+            </div>
+        </div>
+        <div class="dropdown">
+            <button onclick="save()">Save as</button>
+        </div>
+        <div class="dropdown">
+            <button id="insert">Insert</button>
+            <div class="dropdown-content">
+                <label for="img-import" id="img_insert" class="dbtn btn1">Image</label>
+                <label for="pdfinput" id="pdf_insert" class="dbtn btn1">PDF</label>
+            </div>
+        </div>
+        <div class="middle">
+            <div id="name" style="display: inline-block; margin: 0 15px">Note: <input id="notename" placeholder="Note Name" type="text" value="New Note"></div>
+            <div id="savestatus" style="display: inline-block; margin: 0 15px">Unsaved</div>
+        </div> <img src="logo.png" height="32" class="img"> </nav>
+    <div id="captions"> </div>
+    <textarea id="default">
+        <br>
+        <h1>A fresh note awaits...</h1> </textarea>
+    <div id="pp" class="back" style="border:1px solid #ccc; position: absolute; !important; top: 70px; z-index: 99 ">
+        <canvas id="paper" width="1920" height="1999" style="" class=""></canvas>
+    </div>
+    <div class="penset">
+        <div>
+            <button class="abtn abc grey" id="black" title="Black pen"><img src="black.png" width="20px"></button>
+            <button class="abtn abc grey" id="red" title="Red pen"><img src="red.png" width="20px"></button>
+            <button class="abtn abc grey" id="orange" title="Orange pen"><img src="orange.png" width="20px"></button>
+            <button class="abtn abc grey" id="yellow" title="Yellow pen"><img src="yellow.png" width="20px"></button>
+            <button class="abtn abc grey" id="green" title="Green pen"><img src="green.png" width="20px"></button>
+            <button class="abtn abc grey" id="blue" title="Blue pen"><img src="blue.png" width="20px"></button>
+            <button class="abtn abc grey" id="eraser" title="Eraser"><img src="eraser.png" width="20px"></button>
+            <button class="abtn abc grey" id="restorer" title="Restorer"><img src="restoration.png" width="20px"></button>
+            <button class="abtn  grey" id="white" title="Delete tool"><img src="delete.png" width="20px"></button>
+            <button class="abtn  grey" id="textbox" title="Insert textbox"><img src="text.png" width="20px"></button>
+            <button class="abtn  grey" id="circle" title="Insert circle"><img src="circle.png" width="20px"></button>
+            <button class="abtn  grey" id="line" title="Insert line"><img src="remove.png" width="20px"></button>
+            <button class="abtn abc grey " onclick="Copy()"><img src="copy.png" width="20px"></button>
+            <button class="abtn  grey " onclick="Paste()"><img src="paste.png" width="20px"></button>
+            <!--  
+  <input class="abc" type="range" min="0.1" max="50" value="2" id="thickness"><p class="abc" style="background-color: white !important;">Select thickness</p>
+  <input type='color' id="colour" class="abc" /><button type="button" class="abc" id="confcolour">Choose custom colour</button><br>-->
+        </div>
+        <div onclick="togglePen()" class="">
+            <button id="text" class="abtn "><img src="txt.png" width="20"></button>
+            <button id="sel" class="abtn     "><img src="hand-pointer.png" width="20"></button>
+        </div>
+    </div>
+    <script type='text/javascript'>
+
+        document.addEventListener("keydown", function(e) {
+  if ((window.navigator.platform.match("Mac") ? e.metaKey : e.ctrlKey)  && e.keyCode == 83) {
+    e.preventDefault();
+    save();    
+  }
+}, false);
+
+        function Copy() {
+    // clone what are you copying since you
+    // may want copy and paste on different moment.
+    // and you do not want the changes happened
+    // later to reflect on the copy.
+    canvas.getActiveObject().clone(function(cloned) {
+        _clipboard = cloned;
+    });
+}
+function Paste() {
+    // clone again, so you can do multiple copies.
+    _clipboard.clone(function(clonedObj) {
+        canvas.discardActiveObject();
+        clonedObj.set({
+            left: clonedObj.left + 10,
+            top: clonedObj.top + 10,
+            evented: true,
+        });
+        if (clonedObj.type === 'activeSelection') {
+            // active selection needs a reference to the canvas.
+            clonedObj.canvas = canvas;
+            clonedObj.forEachObject(function(obj) {
+                canvas.add(obj);
+            });
+            // this should solve the unselectability
+            clonedObj.setCoords();
+        } else {
+            canvas.add(clonedObj);
+        }
+        _clipboard.top += 10;
+        _clipboard.left += 10;
+        canvas.setActiveObject(clonedObj);
+        canvas.requestRenderAll();
+        
+        canvas.isDrawingMode = false;
+    });
+}
+       function confirmAction() {
+            let confirmAction = confirm("Are you sure to create a new note (any unsaved changes on this note will be lost)");
+       
+        if (confirmAction) {
+            location.reload();
+        } else {
+        }
+    }
+var color = '#000';
+    var canvas = new fabric.Canvas('paper', {
+        isDrawingMode: false
+    });
+    var dht = $('document').height();
+    const interval = setInterval(function() {
+        dht = $(document).height();
+        dht = dht - (dht/10);
+    canvas.setHeight(dht);
+ }, 1000);
+    const canvasContext = canvas.getContext("2d");
+    $("#text").click(function() {
+        canvas.isDrawingMode = false;
+        $("#pp").addClass("back");
+    });
+    $("#sel").click(function() {
+        canvas.isDrawingMode = false;
+    })
+    $(".abc").click(function() {
+        canvas.isDrawingMode = true;
+        $("#pp").removeClass("back");
+
+  canvas.freeDrawingBrush.width = 3;
+    });
+    $("#sel").click(function() {
+        $("#pp").removeClass("back");
+    });
+    $("#black").click(function() {
+        
+        canvas.freeDrawingBrush = new fabric.PencilBrush(canvas);
+        canvas.freeDrawingBrush.color = '#000'
+        color = '#000';
+    });
+    $("#red").click(function() {
+        canvas.freeDrawingBrush = new fabric.PencilBrush(canvas);
+        canvas.freeDrawingBrush.color = '#f00'
+        color = '#f00';
+    });
+    $("#orange").click(function() {
+        canvas.freeDrawingBrush = new fabric.PencilBrush(canvas);
+        canvas.freeDrawingBrush.color = '#f80'
+        color = '#f80';
+    });
+    $("#yellow").click(function() {
+        canvas.freeDrawingBrush = new fabric.PencilBrush(canvas);
+        canvas.freeDrawingBrush.color = '#ff0'
+        color = '#ff0';
+    });
+    $("#green").click(function() {
+        canvas.freeDrawingBrush = new fabric.PencilBrush(canvas);
+        canvas.freeDrawingBrush.color = '#0f0'
+        color = '#0f0';
+    });
+    $("#blue").click(function() {
+        canvas.freeDrawingBrush = new fabric.PencilBrush(canvas);
+        canvas.freeDrawingBrush.color = '#00f'
+        color = '#00f';
+    });
+    $("#eraser").click(function() {
+  canvas.freeDrawingBrush = new fabric.EraserBrush(canvas);
+
+  canvas.freeDrawingBrush.width = 10;
+    });
+    $("#restorer").click(function() {
+         canvas.freeDrawingBrush.inverted = true;
+
+  canvas.freeDrawingBrush.width = 10;
+    });
+    $("#circle").click(function() {
+        var stt = window.scrollY + 100
+         var circle = new fabric.Circle({
+            radius: 50,
+            top: stt,
+            left: 100,
+            fill: '',
+            stroke: color,
+            strokeWidth: 3
+        });
+         canvas.add(circle);
+    });
+    $("#textbox").click(function() {
+
+        var stt = window.scrollY + 100
+        var itext = new fabric.IText('Textbox', {
+    left: 100,
+    top: stt,
+    fill: '#000',
+    strokeWidth: 2,
+});
+         canvas.add(itext);
+    });
+    $("#line").click(function() {
+        
+        var stt = window.scrollY + 100
+         canvas.add(new fabric.Line([50, 100, 50, 300], {
+        left: 170,
+            top: stt,
+        stroke: color,
+        strokeWidth: 3
+    }));
+    });
+    
+    $("#white").click(function() {
+        canvas.remove(canvas.getActiveObject());
+        canvas.getActiveObject().forEachObject(function(obj) {
+                canvas.remove(obj);
+            });
+    })
+    $("#canvas2json").click(function() {
+        canvas.isDrawingMode = false;
+        console.log(JSON.stringify(canvas));
+    });
+    $("#canvas2svg").click(function() {
+        canvas.isDrawingMode = false;
+        console.log(canvas.toSVG());
+    });
+    document.getElementById('img-import').addEventListener('change', function(e) {
+        var file = e.target.files[0];
+                var reader = new FileReader();
+                reader.onload = function (f) {
+                    var data = f.target.result;
+                    fabric.Image.fromURL(data, function (img) {
+                        var oImg = img.set({left: 50, top: 100, angle: 00}).scale(0.9);
+                        canvas.add(oImg).renderAll();
+                        var a = canvas.setActiveObject(oImg);
+                    var dataURL = canvas.toDataURL({ format: 'jpeg', quality: 0.8 });
+     console.log("Canvas Image " + dataURL);
+                document.getElementById('txt').href=dataURL;
+});
+                 };
+                reader.readAsDataURL(file);
+            });
+    var copiedObject,
+copiedObjects = new Array();
+    var txt;
+    document.getElementById('inputfile').addEventListener('change', function() {
+        canvas.clear();
+        var fr = new FileReader();
+        fr.onload = function() {
+            var str = fr.result;
+            var mySubString = str.substring(str.indexOf("<donotes-text>"), str.lastIndexOf("</donotes-text>"));
+            tinymce.activeEditor.setContent(mySubString);
+            var svgdata = str.substring(str.indexOf("<donotes-img>") + 13, str.lastIndexOf("</donotes-img>"));
+             canvas.loadFromJSON(svgdata);
+
+  // re-render the canvas
+  canvas.renderAll();
+            var encoded = svgdata.replace(/\s+/g, " ")
+                // According to Taylor Hunt, lowercase gzips better ... my tiny test confirms this
+            encoded = replaceAll(encoded, "%", "%25");
+            encoded = replaceAll(encoded, "> <", "><"); // normalise spaces elements
+            encoded = replaceAll(encoded, "; }", ";}"); // normalise spaces css
+            encoded = replaceAll(encoded, "<", "%3c");
+            encoded = replaceAll(encoded, ">", "%3e");
+            encoded = replaceAll(encoded, "\"", "'");
+            encoded = replaceAll(encoded, "#", "%23"); // needed for ie and firefox
+            encoded = replaceAll(encoded, "{", "%7b");
+            encoded = replaceAll(encoded, "}", "%7d");
+            encoded = replaceAll(encoded, "|", "%7c");
+            encoded = replaceAll(encoded, "^", "%5e");
+            encoded = replaceAll(encoded, "`", "%60");
+            encoded = replaceAll(encoded, "@", "%40");
+            // charset reportedly not needed ... I need to test before implementing
+            var uri = 'data:image/svg+xml;charset=UTF-8,' + encoded;
+            fabric.Image.fromURL(uri, function(myImg) {
+                //i create an extra var for to change some image properties
+                var img1 = myImg;
+               //canvas.add(img1);
+            });
+        }
+        fr.readAsText(this.files[0]);
+        var tr = new FileReader();
+        tr.readAsDataURL(event.target.files[0]);
+        var openname = event.target.files[0].name;
+        openname = openname.slice(0, -3);
+        document.getElementById("notename").value = openname;
+    });
+var go = false;
+var seconds = 0
+var mins = 0;
+    function save() {
+        var editor = tinyMCE.activeEditor.getContent();
+        editor = editor.trim();
+
+        var first = editor.replace(/(<([^>]+)>)/gi, "");
+        first = first.split(" ")[0] + ' ' + first.split(" ")[1] + ' ' + first.split(" ")[2];
+        first = first.substring(2);
+        var blob = new Blob(["<donotes-version>2</donotes-version><donotes-text>" + editor + "</donotes-text><donotes-img>" + JSON.stringify( canvas.toJSON() ) + "</donotes-img>"], {
+            type: "text/plain;charset=utf-8"
+        });
+        var content = "<donotes-version>2</donotes-version><donotes-text>" + editor + "</donotes-text><donotes-img>" + JSON.stringify( canvas.toJSON() ) + "</donotes-img>";
+        var nname = document.getElementById("notename").value;
+        saveAs(blob, nname + ".dn");
+        $("#savestatus").html("Last saved: <span id=\"minutes\"></span><span id=\"minutest\"></span><span id=\"seconds\">0</span> <span id=\"secondst\">seconds ago</span>");
+         seconds = 0;
+         mins = 0;
+        if(go == false) {
+        setInterval(function() {  go = true; seconds = seconds + 1; if(seconds >= 60) {seconds = 0; mins = mins + 1; $("#minutest").html(" minutes ago ") ; $("#minutes").html(mins); $("#seconds").hide();$("#secondst").hide();}  $("#seconds").html(seconds);}, 1000);
+    }}</script>
+    <script>
+      const Base64Prefix = "data:application/pdf;base64,";
+  function getPdfHandler() {
+      return window['pdfjs-dist/build/pdf'];
+  }
+
+  function readBlob(blob) {
+      return new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.addEventListener('load', () => resolve(reader.result));
+          reader.addEventListener('error', reject)
+          reader.readAsDataURL(blob);
+      })
+  }
+
+  async function printPDF(pdfData, pages) {
+      const pdfjsLib = await getPdfHandler();
+      pdfData = pdfData instanceof Blob ? await readBlob(pdfData) : pdfData;
+      const data = atob(pdfData.startsWith(Base64Prefix) ? pdfData.substring(Base64Prefix.length) : pdfData);
+      // Using DocumentInitParameters object to load binary data.
+      const loadingTask = pdfjsLib.getDocument({ data });
+      return loadingTask.promise
+          .then((pdf) => {
+              const numPages = pdf.numPages;
+              return new Array(numPages).fill(0)
+                  .map((__, i) => {
+                      const pageNumber = i + 1;
+                      if (pages && pages.indexOf(pageNumber) == -1) {
+                          return;
+                      }
+                      return pdf.getPage(pageNumber)
+                          .then((page) => {
+                              //  retina scaling
+                              const viewport = page.getViewport({ scale: window.devicePixelRatio });
+                              // Prepare canvas using PDF page dimensions
+                              const canvas = document.createElement('canvas');
+                              const context = canvas.getContext('2d');
+                              canvas.height = viewport.height
+                              canvas.width = viewport.width;
+                              // Render PDF page into canvas context
+                              const renderContext = {
+                                  canvasContext: context,
+                                  viewport: viewport
+                              };
+                              const renderTask = page.render(renderContext);
+                              return renderTask.promise.then(() => canvas);
+                          });
+                  });
+          });
+  }
+
+  async function pdfToImage(pdfData, canvas) {
+      const scale = 1 / window.devicePixelRatio;
+      return (await printPDF(pdfData))
+          .map(async c => {
+              canvas.add(new fabric.Image(await c, {
+                  scaleX: scale,
+                  scaleY: scale,
+              }));
+          });
+  }
+
+  document.querySelector('#pdfinput').addEventListener('change', async (e) => {
+    canvas.requestRenderAll();
+    await Promise.all(pdfToImage(e.target.files[0], canvas));
+    canvas.remove(text);
+  });
+
+  </script>
+</body>
+</html>
